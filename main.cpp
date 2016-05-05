@@ -12,29 +12,21 @@ int main() {
     TradeProblemGenerator gen = TradeProblemGenerator(days);
     int* prob = gen.generateProblem();
 
-    vector<int> problem;
-    problem.assign(prob, prob+days);
+    vector<int> problem = {5,9,4,6,1,8,4,2,3,3};
+    //problem.assign(prob, prob+days);
 
     for(int i = 0; i < problem.size(); i++)
         cout << i << "\t" << problem[i] << endl;
 
     StrategyFinder finder = StrategyFinder(problem);
 
-    finder.printTrades();
-    finder.printGaps();
-    cout << "++++++++++++++++++++++++++++" << endl;
-    finder.decrementNumberOfTrades();
-    finder.printTrades();
-    finder.printGaps();
-    cout << "++++++++++++++++++++++++++++" << endl;
-    finder.decrementNumberOfTrades();
-    finder.printTrades();
-    finder.printGaps();
-    cout << "++++++++++++++++++++++++++++" << endl;
-    finder.decrementNumberOfTrades();
-    finder.printTrades();
-    finder.printGaps();
-    delete prob;
+
+    while (finder.getNumberOfTrades() > 0){
+        cout << "===" << finder.getNumberOfTrades() << "===" << endl;
+        finder.printTrades();
+        finder.printGaps();
+        finder.decrementNumberOfTrades();
+    }
 
     return 0;
 }

@@ -66,7 +66,7 @@ trade_pair* StrategyFinder::createPair(int transaction1, int transaction2, trade
         pair->value = raw_data[transaction2] - raw_data[transaction1];
         trades.push_back(pair);
         push_heap(trades.begin(), trades.end(), trade_pair_compare());
-    }else {
+    }else { // it is a gap
         pair->value = raw_data[transaction1] - raw_data[transaction2];
         gaps.push_back(pair);
         push_heap(gaps.begin(), gaps.end(), trade_pair_compare());
@@ -138,7 +138,7 @@ trade_pair* StrategyFinder::getLowestTrade() {
 trade_pair *StrategyFinder::popLowestGap() {
     trade_pair* gap = getLowestGap();
     if(gap != nullptr){
-        pop_heap(gaps.begin(), gaps.end());
+        pop_heap(gaps.begin(), gaps.end(), trade_pair_compare());
         gaps.pop_back();
         return gap;
     }
@@ -146,9 +146,9 @@ trade_pair *StrategyFinder::popLowestGap() {
 }
 
 trade_pair *StrategyFinder::popLowestTrade() {
-    trade_pair* trade = getLowestGap();
+    trade_pair* trade = getLowestTrade();
     if(trade != nullptr){
-        pop_heap(trades.begin(), trades.end());
+        pop_heap(trades.begin(), trades.end(), trade_pair_compare());
         trades.pop_back();
         return trade;
     }
@@ -171,11 +171,11 @@ void StrategyFinder::destroyPair(trade_pair *pair) {
             int left_extrema = pair->before->transaction1;
             int right_extrema = pair->after->transaction2;
 
-            if(!pair->isTrade){
+           /* if(!pair->isTrade){
                 int temp = left_extrema;
                 left_extrema = right_extrema;
                 right_extrema = temp;
-            }
+            }*/
 
             trade_pair* before = pair->before->before;
             trade_pair* after = pair->after->after;
@@ -194,4 +194,8 @@ void StrategyFinder::destroyPair(trade_pair *pair) {
         }
 
     }
+}
+
+int StrategyFinder::getNumberOfTrades() {
+    return r;
 }
