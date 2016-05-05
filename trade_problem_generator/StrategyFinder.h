@@ -50,8 +50,7 @@ private:
     trade_pair* getLowestGap();
     trade_pair* popLowestTrade();
     trade_pair* popLowestGap();
-    void mergeTrades(trade_pair* gap);
-    void destroyTrade(trade_pair* trade);
+    void destroyPair(trade_pair* pair);
 
     trade_pair* createPair(int max, int min, trade_pair* previous, trade_pair* next, bool isTrade);
 

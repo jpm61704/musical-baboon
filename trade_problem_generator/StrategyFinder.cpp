@@ -104,12 +104,12 @@ void StrategyFinder::decrementNumberOfTrades() {
         return;
     }
 
+
     if(getLowestGap()->value <= getLowestTrade()->value){
-        trade_pair* lowest_gap = popLowestGap();
-        mergeTrades(lowest_gap);
+        destroyPair(popLowestGap());
         r--;
     }else if(r != 0) {
-        destroyTrade(popLowestTrade());
+        destroyPair(popLowestTrade());
         r--;
     }
 
@@ -155,29 +155,43 @@ trade_pair *StrategyFinder::popLowestTrade() {
     return nullptr;
 }
 
-void StrategyFinder::mergeTrades(trade_pair *gap) {
-    trade_pair* trade1 = gap->before;
-    trade_pair* trade2 = gap->after;
 
-    createPair(trade1->transaction1,trade2->transaction2,trade1->before,trade2->after,true);
-    trade1->active = false;
-    trade2->active = false;
+void StrategyFinder::destroyPair(trade_pair *pair) {
+    bool left_exists = (pair->before != nullptr);
+    bool right_exists = (pair->after != nullptr);
 
-}
+    if(left_exists || right_exists){
+        if(!left_exists){
+            pair->after->before = nullptr;
+            pair->active = false;
+        }else if(!right_exists){
+            pair->before->after = nullptr;
+            pair->active = false;
+        }else{
+            int left_extrema = pair->before->transaction1;
+            int right_extrema = pair->after->transaction2;
 
-void StrategyFinder::destroyTrade(trade_pair *trade) {
-    trade_pair* gap1 = trade->before;
-    trade_pair* gap2 = trade->after;
+            if(!pair->isTrade){
+                int temp = left_extrema;
+                left_extrema = right_extrema;
+                right_extrema = temp;
+            }
 
+            trade_pair* before = pair->before->before;
+            trade_pair* after = pair->after->after;
 
-    if(gap1 != nullptr && gap2 != nullptr){
-        if(gap1->before != nullptr && gap2->after != nullptr)
-            createPair(gap1->transaction1, gap2->transaction2, gap1->before, gap2->after, false);
+            trade_pair* new_pair = createPair(right_extrema, left_extrema,before,after,!pair->isTrade);
+
+            if(before != nullptr)
+                before->after = new_pair;
+            if(after != nullptr)
+                after->before = new_pair;
+
+            pair->active = false;
+            pair->before->active = false;
+            pair->after->active = false;
+
+        }
+
     }
-
-
-    gap2->active = false;
-    gap1->active = false;
-
-
 }
