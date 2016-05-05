@@ -8,6 +8,9 @@ using namespace std;
 
 vector<unsigned int> parse(int days,char* filename);
 
+/**
+ * main program logic, contains cmd line parsing and some other errors
+ */
 int main(int argc, char** argv) {
     unsigned int days = strtoul(argv[1], nullptr, 0);
     unsigned int trades = strtoul(argv[2], nullptr, 0);
@@ -31,6 +34,9 @@ int main(int argc, char** argv) {
     return 0;
 }
 
+/**
+ * parser for the program
+ */
 vector<unsigned int> parse(int days,char* filename){
     double value;
 
