@@ -6,33 +6,36 @@
 #include <algorithm>
 #include "StrategyFinder.h"
 
-StrategyFinder::StrategyFinder(vector<int> data) {
+StrategyFinder::StrategyFinder(vector<unsigned int> data) {
     raw_data = data;
 
-    int min = -1;
-    int max = -1;
+    unsigned int min = 0;
+    unsigned int max = 0;
+    bool lookingForMin = true;
     trade_pair* previous = nullptr;
 
-    for(int i = 0; i < data.size(); i++){
+    for(unsigned int i = 0; i < data.size(); i++){
         if(i == 0 && data[1] > data[0]){ //check if 0 is a local min
             min = 0;
+            lookingForMin = false;
         }else if(i == 0 && data[1] <= data[0]){
             max = 0;
+            lookingForMin = true;
         }else if(i == data.size()-1 && data[i] > data[i-1]){
             max = i;
             previous = createPair(min, max, previous, nullptr, true);
-            min = -1;
+            lookingForMin = true; //min = -1;
         }else if(i == data.size()-1 && data[i] >= min){
 
-        }else if(data[i + 1] > data[i] && data[i - 1] >= data[i] && min == -1){ //check for local min
+        }else if(data[i + 1] > data[i] && data[i - 1] >= data[i] && lookingForMin){ //check for local min
             min = i;
             if(max != 0) //makes sure 0 is not the start of a gap
                 previous = createPair(max, min, previous,nullptr, false);
-            max = -1;
-        }else if(data[i + 1] <= data[i] && data[i - 1] < data[i] && max == -1){ //check for local max
+            lookingForMin = false; //max = -1;
+        }else if(data[i + 1] <= data[i] && data[i - 1] < data[i] && !lookingForMin){ //check for local max
             max = i;
             previous = createPair(min, max, previous,nullptr, true);
-            min = -1;
+            lookingForMin = true; //min = -1;
         }
     }
     r = trades.size();
@@ -41,12 +44,19 @@ StrategyFinder::StrategyFinder(vector<int> data) {
 /**
  * allocates trade_pair
  */
-trade_pair* StrategyFinder::createPair(int transaction1, int transaction2, trade_pair* previous, trade_pair* next, bool isTrade) {
+trade_pair* StrategyFinder::createPair(unsigned int transaction1, unsigned int transaction2, trade_pair* previous, trade_pair* next, bool isTrade) {
 
     trade_pair* pair = new trade_pair;
 
     pair->isTrade = isTrade;
     pair->active = true;
+
+    if(transaction1 > transaction2){
+        unsigned int temp = transaction1;
+        transaction1 = transaction2;
+        transaction2 = temp;
+    }
+
     pair->transaction1 = transaction1;
     pair->transaction2 = transaction2;
 
@@ -77,7 +87,7 @@ trade_pair* StrategyFinder::createPair(int transaction1, int transaction2, trade
 
 void StrategyFinder::printTrades(){
     cout << "buy\tsell\tvalue\tactive" << endl;
-    for(int i = 0; i < trades.size(); i++){
+    for(unsigned int i = 0; i < trades.size(); i++){
         trade_pair* t = trades[i];
         cout << t->transaction1 << "\t" << t->transaction2 << "\t" << t->value << "\t" << t->active <<endl;
     }
@@ -86,7 +96,7 @@ void StrategyFinder::printTrades(){
 void StrategyFinder::printGaps(){
     cout << "Gaps" << endl;
     cout << "sell\tbuy\tvalue\tactive" << endl;
-    for(int i = 0; i < gaps.size(); i++){
+    for(unsigned int i = 0; i < gaps.size(); i++){
         trade_pair* g = gaps[i];
         cout << g->transaction1 << "\t" << g->transaction2 << "\t" << g->value << "\t" << g->active << endl;
     }
@@ -164,18 +174,22 @@ void StrategyFinder::destroyPair(trade_pair *pair) {
         if(!left_exists){
             pair->after->before = nullptr;
             pair->active = false;
+            pair->after->active = false;
+            pair->after->after->before = nullptr;
         }else if(!right_exists){
             pair->before->after = nullptr;
             pair->active = false;
+            pair->before->before->after = nullptr;
+            pair->before->active = false;
         }else{
-            int left_extrema = pair->before->transaction1;
-            int right_extrema = pair->after->transaction2;
+            unsigned int left_extrema = pair->before->transaction1;
+            unsigned int right_extrema = pair->after->transaction2;
 
-           /* if(!pair->isTrade){
-                int temp = left_extrema;
+            if(!pair->isTrade){
+                unsigned int temp = left_extrema;
                 left_extrema = right_extrema;
                 right_extrema = temp;
-            }*/
+            }
 
             trade_pair* before = pair->before->before;
             trade_pair* after = pair->after->after;
@@ -196,6 +210,15 @@ void StrategyFinder::destroyPair(trade_pair *pair) {
     }
 }
 
-int StrategyFinder::getNumberOfTrades() {
+unsigned int StrategyFinder::getNumberOfTrades() {
     return r;
+}
+
+void StrategyFinder::printFinalTrades() {
+    sort(trades.begin(), trades.end(),trade_pair_compare_for_print());
+    for(unsigned int i = 0; i < trades.size(); i++){
+        if(trades[i]->active){
+            cout << trades[i]->transaction1+1 << endl << trades[i]->transaction2+1 << endl;
+        }
+    }
 }

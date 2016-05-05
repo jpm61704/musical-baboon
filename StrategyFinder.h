@@ -12,7 +12,7 @@ using namespace std;
 //should I add pointers for the before and after pair?
 struct trade_pair{
     bool isTrade, active;
-    int transaction1, transaction2, value;
+    unsigned int transaction1, transaction2, value;
     trade_pair* before;
     trade_pair* after;
 };
@@ -23,28 +23,40 @@ struct trade_pair_compare{
     }
 };
 
+struct trade_pair_compare_for_print{
+    bool operator()(trade_pair* t1, trade_pair* t2) const{
+        if(t1->active && t2->active)
+            return t1->transaction1 < t2->transaction1;
+        else if(t1->active)
+            return true;
+        else
+            return false;
+    }
+};
+
 /*
  * used to rank trades and gaps for removal and merging
  */
 
 class StrategyFinder {
 public:
-    StrategyFinder(vector<int> data);
+    StrategyFinder(vector<unsigned int> data);
     StrategyFinder();
     void decrementNumberOfTrades();
-    int getNumberOfTrades();
+    unsigned int getNumberOfTrades();
     bool isActive();
     void printGaps();
     void printTrades();
+    void printFinalTrades();
 
 
 private:
-    int r;
+    unsigned int r;
     bool activated;
 
     vector<struct trade_pair*> trades;
     vector<struct trade_pair*> gaps;
-    vector<int> raw_data;
+    vector<unsigned int> raw_data;
 
     trade_pair* getLowestTrade();
     trade_pair* getLowestGap();
@@ -52,7 +64,7 @@ private:
     trade_pair* popLowestGap();
     void destroyPair(trade_pair* pair);
 
-    trade_pair* createPair(int max, int min, trade_pair* previous, trade_pair* next, bool isTrade);
+    trade_pair* createPair(unsigned int max, unsigned int min, trade_pair* previous, trade_pair* next, bool isTrade);
 
 
 
