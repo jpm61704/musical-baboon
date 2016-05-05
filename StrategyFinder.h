@@ -41,10 +41,9 @@ struct trade_pair_compare_for_print{
 class StrategyFinder {
 public:
     StrategyFinder(vector<unsigned int> data);
-    StrategyFinder();
+    ~StrategyFinder();
     void decrementNumberOfTrades();
     unsigned int getNumberOfTrades();
-    bool isActive();
     void printGaps();
     void printTrades();
     void printFinalTrades();
@@ -52,7 +51,6 @@ public:
 
 private:
     unsigned int r;
-    bool activated;
 
     vector<struct trade_pair*> trades;
     vector<struct trade_pair*> gaps;

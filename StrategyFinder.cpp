@@ -222,3 +222,12 @@ void StrategyFinder::printFinalTrades() {
         }
     }
 }
+
+StrategyFinder::~StrategyFinder() {
+    for(int i = 0; i < trades.size(); i++){
+        delete trades[i];
+    }
+    for(int i = 0; i < gaps.size(); i++){
+        delete gaps[i];
+    }
+}
