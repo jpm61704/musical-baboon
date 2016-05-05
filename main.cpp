@@ -40,6 +40,7 @@ vector<unsigned int> parse(int days,char* filename){
 
     if(fp == nullptr) {
         printf("File does not exist");
+        fclose(fp);
         exit(1);
     }
 
@@ -47,19 +48,22 @@ vector<unsigned int> parse(int days,char* filename){
         int matched = fscanf(fp, "%lf", &value);
         if(matched != 1){
             printf("Parsing Error: Invalid Format");
+            fclose(fp);
             exit(3);
         }
         if(value < 0){
             printf("Parsing Error: Negative Number");
+            fclose(fp);
             exit(4);
         }
         unsigned int submit = (unsigned int)value;
         if((value - (double)submit) != 0){
             printf("Parsing Error: Decimal Value");
+            fclose(fp);
             exit(5);
         }
 
-        v.push_back(value);
+        v.push_back(submit);
     }
 
 
