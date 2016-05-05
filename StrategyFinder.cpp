@@ -5,7 +5,7 @@
 #include <iostream>
 #include <algorithm>
 #include "StrategyFinder.h"
-
+//O(n)
 StrategyFinder::StrategyFinder(vector<unsigned int> data) {
     raw_data = data;
 
@@ -43,6 +43,7 @@ StrategyFinder::StrategyFinder(vector<unsigned int> data) {
 
 /**
  * allocates trade_pair
+ * O(C), C = constant
  */
 trade_pair* StrategyFinder::createPair(unsigned int transaction1, unsigned int transaction2, trade_pair* previous, trade_pair* next, bool isTrade) {
 
@@ -84,7 +85,7 @@ trade_pair* StrategyFinder::createPair(unsigned int transaction1, unsigned int t
     return pair;
 }
 
-
+//O(n) 
 void StrategyFinder::printTrades(){
     cout << "buy\tsell\tvalue\tactive" << endl;
     for(unsigned int i = 0; i < trades.size(); i++){
@@ -101,8 +102,9 @@ void StrategyFinder::printGaps(){
         cout << g->transaction1 << "\t" << g->transaction2 << "\t" << g->value << "\t" << g->active << endl;
     }
 }
-
+//O(n)
 void StrategyFinder::decrementNumberOfTrades() {
+    //O(n)
     while(gaps.size() != 0 && !getLowestGap()->active){
         popLowestGap();
     }
@@ -114,7 +116,7 @@ void StrategyFinder::decrementNumberOfTrades() {
         return;
     }
 
-
+//O(1)
     if(getLowestGap()->value <= getLowestTrade()->value){
         destroyPair(popLowestGap());
         r--;
@@ -122,7 +124,7 @@ void StrategyFinder::decrementNumberOfTrades() {
         destroyPair(popLowestTrade());
         r--;
     }
-
+//O(n)
     while(gaps.size() != 0 && !getLowestGap()->active){
         popLowestGap();
     }
@@ -130,21 +132,21 @@ void StrategyFinder::decrementNumberOfTrades() {
         popLowestTrade();
     }
 }
-
+//O(C)
 trade_pair* StrategyFinder::getLowestGap() {
     if(gaps.size() != 0)
         return gaps[0];
     else
         return nullptr;
 }
-
+//O(C)
 trade_pair* StrategyFinder::getLowestTrade() {
     if(trades.size() != 0)
         return trades[0];
     else
         return nullptr;
 }
-
+//Ologn)
 trade_pair *StrategyFinder::popLowestGap() {
     trade_pair* gap = getLowestGap();
     if(gap != nullptr){
@@ -154,10 +156,11 @@ trade_pair *StrategyFinder::popLowestGap() {
     }
     return nullptr;
 }
-
+//o(logn)?
 trade_pair *StrategyFinder::popLowestTrade() {
     trade_pair* trade = getLowestTrade();
     if(trade != nullptr){
+        //pop_heap?
         pop_heap(trades.begin(), trades.end(), trade_pair_compare());
         trades.pop_back();
         return trade;
@@ -165,7 +168,7 @@ trade_pair *StrategyFinder::popLowestTrade() {
     return nullptr;
 }
 
-
+//O(C)
 void StrategyFinder::destroyPair(trade_pair *pair) {
     bool left_exists = (pair->before != nullptr);
     bool right_exists = (pair->after != nullptr);
@@ -209,11 +212,11 @@ void StrategyFinder::destroyPair(trade_pair *pair) {
 
     }
 }
-
+//O(C)
 unsigned int StrategyFinder::getNumberOfTrades() {
     return r;
 }
-
+//O(size)
 void StrategyFinder::printFinalTrades() {
     sort(trades.begin(), trades.end(),trade_pair_compare_for_print());
     for(unsigned int i = 0; i < trades.size(); i++){
