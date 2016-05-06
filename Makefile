@@ -4,7 +4,7 @@ Target = CS3050FinalProject
 FILES = main.cpp trade_problem_generator/TradeProblemGenerator.cpp trade_problem_generator/TradeProblemGenerator.h StrategyFinder.cpp StrategyFinder.h
 
 all: main.cpp
-	g++ -std=c++0x $(FILES)
+	g++ -o $(Target).exe -std=c++0x $(FILES)
 
 clean:
-	$(RM) bin/$(TARGET).exe
+	$(RM) $(Target).exe
